@@ -69,11 +69,22 @@ const MentionsPlugin = (options?: Options): SlatePlugin => {
       );
     },
     onKeyDown(event: KeyboardEvent, data: any, state: Object, editor: Object) {
+      console.log('data =', data);
       switch (event.which) {
         // If the user types an @ we add a mention mark if we're not already in one
         case AT_SIGN: {
           if (currentlyInMention(state)) return;
-          return state.transform().insertBlock('mention').focus().apply();
+
+          event.preventDefault();
+
+          return state
+            .transform()
+            .insertText('@')
+            .extend(-1)
+            .wrapInline('mention')
+            .move(1)
+            .focus()
+            .apply();
         }
         // If we're in a mention and either space or enter are pressed
         // jump out of the mention and insert a space
@@ -95,15 +106,17 @@ const MentionsPlugin = (options?: Options): SlatePlugin => {
             const mentionLength = state.selection.startOffset - at - 1;
 
             // Remove the current, incomplete text and replace it with the selected suggestion
-            return state
-              .transform()
-              .deleteBackward(mentionLength)
-              .insertText(text)
-              .splitBlock()
-              .setBlock('default')
-              .insertText(' ')
-              .focus()
-              .apply();
+            return (
+              state
+                .transform()
+                .deleteBackward(mentionLength)
+                .insertText(text)
+                //.splitBlock()
+                //.setBlock('default')
+                .insertText(' ')
+                .focus()
+                .apply()
+            );
           }
         }
         case DOWN_ARROW: {

@@ -33,6 +33,7 @@ class App extends Component {
   }
 
   onChange = state => {
+    console.log('state =', state);
     this.setState({
       state,
     });

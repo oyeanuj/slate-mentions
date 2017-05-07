@@ -1,7 +1,8 @@
 import { FIRST_MENTION } from './constants';
 
 export const currentlyInMention = (state: Object) =>
-  state.blocks.some(block => block.type === 'mention');
+  state.inlines.some(inline => inline.type === 'mention');
+//state.blocks.some(block => block.type === 'mention');
 
 // Find the index of the nearest "@" going backwards in text from end index
 export const nearestAt = (text: string, end: number) => {
