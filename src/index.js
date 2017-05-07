@@ -1,5 +1,6 @@
 // @flow
 import React from 'react';
+import { Inline } from 'slate';
 
 import Portal from './lib/Portal';
 import {
@@ -77,12 +78,17 @@ const MentionsPlugin = (options?: Options): SlatePlugin => {
 
           event.preventDefault();
 
+          //If I use wrapInline.move(1), I get an error:
+          //Cannot read property 'firstChild' of null
+          //at findDeepestNode (find-deepest-node.js:15)
+
           return state
             .transform()
             .insertText('@')
             .extend(-1)
             .wrapInline('mention')
-            .move(1)
+            .collapseToStartOfNextText()
+            .collapseToStartOfNextText()
             .focus()
             .apply();
         }
@@ -91,6 +97,8 @@ const MentionsPlugin = (options?: Options): SlatePlugin => {
         case SPACE:
           // Need to preventDefault here as we'd otherwise insert two spaces
           if (currentlyInMention(state)) event.preventDefault();
+          break;
+
         case ENTER: {
           if (currentlyInMention(state)) {
             const { suggestions } = editor.props;
@@ -151,6 +159,10 @@ const MentionsPlugin = (options?: Options): SlatePlugin => {
             });
           } else {
             // keycode 48 = "0", keycode 90 = "z", covers all characters
+
+            console.log('state =', state);
+            console.log('selection =', state.selection);
+
             const currentInput = data.code >= 48 && data.code <= 90
               ? data.key
               : '';
